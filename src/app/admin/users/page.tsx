@@ -9,11 +9,10 @@ import {
   Briefcase,
   Lock,
   Unlock,
-  CheckCircle2,
   AlertCircle,
-  Clock,
   X,
   Search,
+  Loader2,
 } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 
@@ -41,8 +40,12 @@ export default function UserManagementPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("HR");
-  const [modalError, setModalError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Trạng thái đánh đỏ lỗi từng ô (UI/UX Guidelines)
+  const [modalGeneralError, setModalGeneralError] = useState("");
+  const [errorField, setErrorField] = useState<"fullName" | "email" | "password" | "">("");
+  const [fieldErrorMsg, setFieldErrorMsg] = useState("");
 
   const fetchUsers = async () => {
     try {
@@ -65,7 +68,9 @@ export default function UserManagementPage() {
   // Xử lý tạo User mới
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    setModalError("");
+    setModalGeneralError("");
+    setErrorField("");
+    setFieldErrorMsg("");
     setSubmitting(true);
 
     try {
@@ -77,7 +82,12 @@ export default function UserManagementPage() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setModalError(data.error || "Không thể tạo tài khoản");
+        if (data.field) {
+          setErrorField(data.field);
+          setFieldErrorMsg(data.error);
+        } else {
+          setModalGeneralError(data.error || "Không thể tạo tài khoản");
+        }
         return;
       }
 
@@ -86,9 +96,11 @@ export default function UserManagementPage() {
       setFullName("");
       setEmail("");
       setPassword("");
+      setErrorField("");
+      setFieldErrorMsg("");
       fetchUsers();
     } catch {
-      setModalError("Lỗi kết nối máy chủ");
+      setModalGeneralError("Lỗi kết nối máy chủ");
     } finally {
       setSubmitting(false);
     }
@@ -135,8 +147,13 @@ export default function UserManagementPage() {
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-500/20 transition-all self-start sm:self-auto"
+          onClick={() => {
+            setErrorField("");
+            setFieldErrorMsg("");
+            setModalGeneralError("");
+            setIsModalOpen(true);
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-500/20 transition-all self-start sm:self-auto cursor-pointer"
         >
           <UserPlus className="w-4 h-4" />
           + Thêm Tài khoản Mới
@@ -237,7 +254,7 @@ export default function UserManagementPage() {
                     <td className="py-3 px-4 text-right">
                       <button
                         onClick={() => handleToggleActive(user.id, user.isActive)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
                           user.isActive
                             ? "border-red-200 text-red-600 hover:bg-red-50"
                             : "border-green-200 text-green-600 hover:bg-green-50"
@@ -262,7 +279,7 @@ export default function UserManagementPage() {
         )}
       </div>
 
-      {/* Modal Thêm Người Dùng Mới */}
+      {/* Modal Thêm Người Dùng Mới (Tuân thủ UI/UX Guidelines) */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
@@ -280,13 +297,14 @@ export default function UserManagementPage() {
             </div>
 
             <form onSubmit={handleCreateUser} className="p-5 space-y-4">
-              {modalError && (
+              {modalGeneralError && (
                 <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
-                  <span>{modalError}</span>
+                  <span>{modalGeneralError}</span>
                 </div>
               )}
 
+              {/* Họ tên */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Họ và tên nhân viên <span className="text-red-500">*</span>
@@ -295,12 +313,29 @@ export default function UserManagementPage() {
                   type="text"
                   required
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    if (errorField === "fullName") {
+                      setErrorField("");
+                      setFieldErrorMsg("");
+                    }
+                  }}
                   placeholder="Ví dụ: Lê Bảo Hoàng"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className={`w-full px-3.5 py-2.5 border rounded-xl text-sm transition-all text-slate-900 ${
+                    errorField === "fullName"
+                      ? "border-red-500 bg-red-50/20 text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  }`}
                 />
+                {errorField === "fullName" && (
+                  <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrorMsg}</span>
+                  </p>
+                )}
               </div>
 
+              {/* Email (Có kiểm tra trùng lặp) */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Email công ty <span className="text-red-500">*</span>
@@ -309,12 +344,29 @@ export default function UserManagementPage() {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errorField === "email") {
+                      setErrorField("");
+                      setFieldErrorMsg("");
+                    }
+                  }}
                   placeholder="hoang.le@recoverx.career"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className={`w-full px-3.5 py-2.5 border rounded-xl text-sm transition-all text-slate-900 ${
+                    errorField === "email"
+                      ? "border-red-500 bg-red-50/20 text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  }`}
                 />
+                {errorField === "email" && (
+                  <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrorMsg}</span>
+                  </p>
+                )}
               </div>
 
+              {/* Mật khẩu (Có kiểm tra tối thiểu 8 ký tự BRL-Auth) */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Mật khẩu khởi tạo <span className="text-red-500">*</span>
@@ -323,13 +375,31 @@ export default function UserManagementPage() {
                   type="password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Tối thiểu 8 ký tự (BRL-Auth)"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errorField === "password") {
+                      setErrorField("");
+                      setFieldErrorMsg("");
+                    }
+                  }}
+                  placeholder="Tối thiểu 8 ký tự"
+                  className={`w-full px-3.5 py-2.5 border rounded-xl text-sm transition-all text-slate-900 ${
+                    errorField === "password"
+                      ? "border-red-500 bg-red-50/20 text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  }`}
                 />
-                <p className="text-[11px] text-slate-400 mt-1">Tuân thủ BRL-Auth: Tối thiểu 8 ký tự.</p>
+                {errorField === "password" ? (
+                  <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fieldErrorMsg}</span>
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-slate-400 mt-1">Yêu cầu BRL-Auth: Tối thiểu 8 ký tự.</p>
+                )}
               </div>
 
+              {/* Vai trò */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Phân quyền Vai trò (Role) <span className="text-red-500">*</span>
@@ -337,7 +407,7 @@ export default function UserManagementPage() {
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white text-slate-900"
                 >
                   <option value="HR">HR LEAD — Quản lý tuyển dụng, duyệt CV, kéo thả Kanban</option>
                   <option value="HIRING_MANAGER">HIRING MANAGER — Phỏng vấn & Chấm điểm Scorecard</option>
@@ -349,16 +419,23 @@ export default function UserManagementPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-colors"
+                  className="px-4 py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-all disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-all disabled:opacity-60 cursor-pointer"
                 >
-                  {submitting ? "Đang lưu..." : "Tạo Tài Khoản"}
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Đang lưu vào CSDL...</span>
+                    </>
+                  ) : (
+                    <span>Tạo Tài Khoản</span>
+                  )}
                 </button>
               </div>
             </form>

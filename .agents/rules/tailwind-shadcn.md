@@ -39,3 +39,16 @@
 ## 3. Responsive & Accessibility Guidelines
 - Use utility function `cn()` from `src/lib/utils.ts` (combining `clsx` and `tailwind-merge`).
 - Ensure hover states, active states, and focus rings (`focus:ring-2 focus:ring-indigo-500`) are clearly visible for keyboard accessibility.
+
+## 4. Bắt buộc Tuân thủ: Quy chuẩn UI/UX & Xử lý Lỗi Biểu mẫu (Form Validation)
+AI Agents MUST strictly enforce `docs/11_UI_UX_Design_and_Form_Validation_Guidelines.md` across all screens:
+1. **Field-level Error Highlighting:**
+   - Khi ô input bị lỗi: bắt buộc dùng `border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50/20`.
+   - Bắt buộc có dòng thông báo lỗi cụ thể ngay dưới chân: `<p className="text-xs text-red-600 mt-1 flex items-center gap-1">`.
+2. **Actionable Error Messages:**
+   - Tuyệt đối không dùng thông báo chung chung ("Lỗi", "Thất bại").
+   - Phải chỉ rõ sai cái gì, thiếu cái gì (ví dụ: "Mật khẩu chỉ có 5 ký tự (yêu cầu tối thiểu 8 ký tự theo BRL-Auth)").
+3. **Deduplication UI:**
+   - Khi phát hiện trùng lặp Email/Phone, nêu rõ đối tượng bị trùng và thời điểm nộp đơn trước đó.
+4. **Context Isolation:**
+   - Trang Login và Cổng Public tuyệt đối không hiển thị Navbar hoặc thông tin tài khoản nội bộ.

@@ -36,10 +36,24 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { fullName, email, password, role } = body;
 
-    // Kiểm tra đầu vào
-    if (!fullName || !email || !password || !role) {
+    // Kiểm tra từng đầu vào và trả về field cụ thể
+    if (!fullName || !fullName.trim()) {
       return NextResponse.json(
-        { success: false, error: "Vui lòng điền đầy đủ Họ tên, Email, Mật khẩu và Vai trò" },
+        { success: false, error: "Vui lòng nhập đầy đủ Họ và Tên nhân viên", field: "fullName" },
+        { status: 400 }
+      );
+    }
+
+    if (!email || !email.trim()) {
+      return NextResponse.json(
+        { success: false, error: "Vui lòng nhập địa chỉ Email công ty", field: "email" },
+        { status: 400 }
+      );
+    }
+
+    if (!password) {
+      return NextResponse.json(
+        { success: false, error: "Vui lòng nhập Mật khẩu", field: "password" },
         { status: 400 }
       );
     }
@@ -47,19 +61,27 @@ export async function POST(req: Request) {
     // BRL-Auth: Kiểm tra độ dài mật khẩu >= 8 ký tự
     if (password.length < 8) {
       return NextResponse.json(
-        { success: false, error: "Mật khẩu phải có tối thiểu 8 ký tự theo BRL-Auth" },
+        {
+          success: false,
+          error: `Mật khẩu hiện có ${password.length} ký tự. Yêu cầu tối thiểu 8 ký tự theo quy tắc BRL-Auth.`,
+          field: "password",
+        },
         { status: 400 }
       );
     }
 
-    // Kiểm tra email đã tồn tại chưa
+    // Kiểm tra email đã tồn tại chưa (Khử trùng lặp)
     const existing = await prisma.user.findUnique({
       where: { email: email.toLowerCase().trim() },
     });
 
     if (existing) {
       return NextResponse.json(
-        { success: false, error: "Email này đã được sử dụng trong hệ thống" },
+        {
+          success: false,
+          error: `Email "${email}" đã được đăng ký bởi nhân viên "${existing.fullName}" trong hệ thống.`,
+          field: "email",
+        },
         { status: 409 }
       );
     }

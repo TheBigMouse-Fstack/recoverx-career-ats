@@ -26,6 +26,7 @@ D:\ATS project/
 │   ├── 08_NonFunctional_and_Permissions.md      # Ma trận phân quyền RBAC & Yêu cầu phi chức năng (NFR)
 │   ├── 09_Technical_Setup_and_Antigravity_Guide.md # Định hướng Frontend, Clone Dashboard & Hướng dẫn thiết lập Antigravity CI
 │   ├── 10_Scope_and_System_Comparison.md        # Bản phân định In/Out-Scope, hệ thống clone & so sánh điểm hơn/kém
+│   ├── 11_UI_UX_Design_and_Form_Validation_Guidelines.md # Quy chuẩn bắt buộc UI/UX, đánh đỏ ô lỗi & thông điệp rõ ràng
 │   └── TEST_SCENARIOS_AND_UAT_GUIDE.md          # Hướng dẫn 7 kịch bản kiểm thử thực hành (UAT Test Scenarios)
 │
 ├── media/                                       # Toàn bộ 14 hình ảnh sơ đồ & tệp đính kèm gốc

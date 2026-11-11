@@ -8,9 +8,17 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, password } = body;
 
-    if (!email || !password) {
+    // Kiểm tra thiếu trường
+    if (!email) {
       return NextResponse.json(
-        { success: false, error: "Vui lòng nhập đầy đủ Email và Mật khẩu" },
+        { success: false, error: "Vui lòng nhập địa chỉ Email", field: "email" },
+        { status: 400 }
+      );
+    }
+
+    if (!password) {
+      return NextResponse.json(
+        { success: false, error: "Vui lòng nhập Mật khẩu", field: "password" },
         { status: 400 }
       );
     }
@@ -22,14 +30,22 @@ export async function POST(req: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "Email hoặc mật khẩu không chính xác" },
+        {
+          success: false,
+          error: `Không tìm thấy tài khoản với email "${email}". Vui lòng kiểm tra lại.`,
+          field: "email",
+        },
         { status: 401 }
       );
     }
 
     if (!user.isActive) {
       return NextResponse.json(
-        { success: false, error: "Tài khoản của bạn đã bị khóa bởi Quản trị viên" },
+        {
+          success: false,
+          error: "Tài khoản của bạn đã bị Quản trị viên tạm khóa. Vui lòng liên hệ Admin.",
+          field: "email",
+        },
         { status: 403 }
       );
     }
@@ -39,7 +55,11 @@ export async function POST(req: Request) {
 
     if (!isMatch) {
       return NextResponse.json(
-        { success: false, error: "Email hoặc mật khẩu không chính xác" },
+        {
+          success: false,
+          error: "Mật khẩu không chính xác. Vui lòng kiểm tra lại.",
+          field: "password",
+        },
         { status: 401 }
       );
     }
