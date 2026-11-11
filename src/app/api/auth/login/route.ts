@@ -34,13 +34,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Kiểm tra mật khẩu (Hỗ trợ demo: cho phép password = "hashed_password_..." hoặc khớp mật khẩu)
-    const isMatch =
-      user.passwordHash === password ||
-      user.passwordHash.includes(password) ||
-      password === "admin123" ||
-      password === "123456" ||
-      password === user.passwordHash;
+    // Kiểm tra mật khẩu chính xác
+    const isMatch = user.passwordHash === password;
 
     if (!isMatch) {
       return NextResponse.json(

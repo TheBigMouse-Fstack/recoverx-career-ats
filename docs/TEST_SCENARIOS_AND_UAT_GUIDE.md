@@ -21,28 +21,32 @@ Trước khi bắt đầu kiểm thử, bạn mở cửa sổ dòng lệnh (Term
 
 ## II. DANH SÁCH 7 KỊCH BẢN KIỂM THỬ THỦ CÔNG (MANUAL TEST CASES)
 
-### 📌 KỊCH BẢN 1 (TC-AUTH-01): ĐĂNG NHẬP NHANH BẰNG "DEMO 1-CLICK SWITCHER"
-* **Mục tiêu:** Kiểm tra tiện ích phục vụ thuyết trình đồ án ITBA, chuyển đổi tức thì giữa các vai trò mà không cần gõ phím.
+### 📌 KỊCH BẢN 1 (TC-AUTH-01): ĐĂNG NHẬP VỚI TÀI KHOẢN ADMIN
+* **Mục tiêu:** Kiểm tra đăng nhập với quyền Quản trị viên tối cao.
 * **Màn hình:** `http://localhost:3000/admin/login`
 * **Các bước thực hiện:**
-  1. Truy cập vào đường dẫn: `http://localhost:3000/admin/login`.
-  2. Kéo xuống phần khung màu vàng **"Tiện ích Thuyết trình ITBA (1-Click Login)"**.
-  3. Bấm vào nút: **`1. Đăng nhập quyền ADMIN (Nguyễn Văn An)`**.
+  1. Truy cập: `http://localhost:3000/admin/login`.
+  2. Quan sát giao diện: Hoàn toàn sạch sẽ, không có Navbar và không lộ tên người dùng.
+  3. Nhập Email: `admin@recoverx.career`.
+  4. Nhập Mật khẩu: `Admin@123`.
+  5. Bấm nút **"Đăng nhập hệ thống"**.
 * **Kết quả mong đợi (Expected Result):**
-  * Hệ thống tự động chuyển hướng vào trang quản trị.
-  * Nhìn lên thanh menu góc trên bên phải: Hiển thị tên **Nguyễn Văn An**, vai trò **Quản trị viên (ADMIN)**.
-  * Trên thanh Menu xuất hiện tab **"Quản trị User (Admin)"** (vì tài khoản Admin mới có quyền này).
+  * Hệ thống chuyển hướng vào trang quản trị.
+  * Góc trên bên phải hiển thị tên: **Nguyễn Văn An**, huy hiệu xanh lá: **ADMIN**.
+  * Trên thanh Menu xuất hiện tab **"Quản trị User (Admin)"** (đúng theo phân quyền RBAC).
 
 ---
 
-### 📌 KỊCH BẢN 2 (TC-AUTH-02): KIỂM TRA PHÂN QUYỀN RBAC (ẨN/HIỆN MENU THEO VAI TRÒ)
+### 📌 KỊCH BẢN 2 (TC-AUTH-02): KIỂM TRA PHÂN QUYỀN RBAC (ĐĂNG NHẬP VAI HR LEAD)
 * **Mục tiêu:** Kiểm chứng ma trận phân quyền RBAC: HR Lead không được quyền can thiệp vào tài khoản User.
 * **Các bước thực hiện:**
-  1. Khi đang ở trang quản trị, bấm vào nút **`Demo Switcher`** màu vàng trên thanh Navbar.
-  2. Chọn: **`2. Nguyễn Thu Hà — Vai trò: HR LEAD`**.
+  1. Bấm nút icon **Đăng xuất (LogOut)** ở góc phải màn hình ➔ Hệ thống quay về `/admin/login`.
+  2. Nhập Email: `hr@recoverx.career`.
+  3. Nhập Mật khẩu: `Hr@123456`.
+  4. Bấm **"Đăng nhập hệ thống"**.
 * **Kết quả mong đợi (Expected Result):**
-  * Tên góc phải đổi sang **Nguyễn Thu Hà (Chuyên viên Tuyển dụng)**.
-  * Tab **"Quản trị User (Admin)"** trên thanh Navbar **TỰ ĐỘNG BIẾN MẤT** hoàn toàn (đúng theo Ma trận phân quyền RBAC trong Mục 13).
+  * Tên góc phải hiển thị: **Nguyễn Thu Hà**, huy hiệu xanh dương: **HR LEAD**.
+  * Tab **"Quản trị User (Admin)"** trên thanh Navbar **TỰ ĐỘNG BIẾN MẤT** (vì chỉ Admin mới có quyền này).
 
 ---
 

@@ -9,10 +9,6 @@ import {
   Users,
   Database,
   LogOut,
-  ShieldAlert,
-  ChevronDown,
-  Sparkles,
-  CheckCircle2,
 } from "lucide-react";
 import { SessionUser } from "@/lib/auth";
 
@@ -20,47 +16,37 @@ export default function AdminNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [isDemoDropdownOpen, setIsDemoDropdownOpen] = useState(false);
 
-  // Lấy user hiện tại
+  // Lấy thông tin user hiện tại nếu không phải trang login
   useEffect(() => {
+    if (pathname === "/admin/login") return;
+
     fetch("/api/auth/me")
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.user) {
           setCurrentUser(data.user);
+        } else {
+          // Chưa đăng nhập thì chuyển hướng về trang login
+          router.push("/admin/login");
         }
       })
-      .catch(() => {});
-  }, []);
-
-  // Chuyển vai trò Demo tức thì (1-Click Switcher)
-  const handleQuickSwitch = async (email: string) => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password: "123" }),
+      .catch(() => {
+        router.push("/admin/login");
       });
-      const data = await res.json();
-      if (data.success) {
-        setCurrentUser(data.user);
-        setIsDemoDropdownOpen(false);
-        router.refresh();
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [pathname, router]);
+
+  // Tuyệt đối không hiển thị Navbar trên trang Login
+  if (pathname === "/admin/login") {
+    return null;
+  }
 
   // Đăng xuất
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
+    setCurrentUser(null);
     router.push("/admin/login");
+    router.refresh();
   };
 
   const navLinks = [
@@ -76,7 +62,7 @@ export default function AdminNavbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo & Navigation */}
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2.5">
+            <Link href="/admin/pipeline" className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-sm shadow-brand-500/30">
                 <Briefcase className="w-5 h-5" />
               </div>
@@ -113,80 +99,36 @@ export default function AdminNavbar() {
             </nav>
           </div>
 
-          {/* User & 1-Click Demo Switcher */}
+          {/* User Profile & Logout */}
           <div className="flex items-center gap-3">
-            {/* Thanh Demo Switcher */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsDemoDropdownOpen(!isDemoDropdownOpen)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-800 text-xs font-semibold hover:bg-amber-100 transition-colors shadow-xs"
-                title="Đổi vai trò nhanh để thuyết trình đồ án ITBA"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>Demo Switcher</span>
-                <ChevronDown className="w-3 h-3 text-amber-600 ml-0.5" />
-              </button>
-
-              {isDemoDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 p-2 z-50 text-xs space-y-1">
-                  <div className="px-2 py-1 text-slate-400 font-semibold uppercase text-[10px] tracking-wider">
-                    Chuyển nhanh vai trò Demo:
-                  </div>
-
-                  <button
-                    onClick={() => handleQuickSwitch("admin@recoverx.career")}
-                    className="w-full text-left p-2 rounded-lg hover:bg-emerald-50 flex items-center justify-between text-slate-700 transition-colors"
-                  >
-                    <div>
-                      <p className="font-semibold text-slate-900">1. Nguyễn Văn An</p>
-                      <p className="text-[11px] text-emerald-600 font-medium">Vai trò: ADMIN (Toàn quyền)</p>
-                    </div>
-                    {currentUser?.role === "ADMIN" && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
-                  </button>
-
-                  <button
-                    onClick={() => handleQuickSwitch("hr@recoverx.career")}
-                    className="w-full text-left p-2 rounded-lg hover:bg-blue-50 flex items-center justify-between text-slate-700 transition-colors"
-                  >
-                    <div>
-                      <p className="font-semibold text-slate-900">2. Nguyễn Thu Hà</p>
-                      <p className="text-[11px] text-blue-600 font-medium">Vai trò: HR LEAD (Tuyển dụng)</p>
-                    </div>
-                    {currentUser?.role === "HR" && <CheckCircle2 className="w-4 h-4 text-blue-600" />}
-                  </button>
-
-                  <button
-                    onClick={() => handleQuickSwitch("techlead@recoverx.career")}
-                    className="w-full text-left p-2 rounded-lg hover:bg-purple-50 flex items-center justify-between text-slate-700 transition-colors"
-                  >
-                    <div>
-                      <p className="font-semibold text-slate-900">3. Trần Minh Quân</p>
-                      <p className="text-[11px] text-purple-600 font-medium">Vai trò: HIRING MANAGER (Chấm Scorecard)</p>
-                    </div>
-                    {currentUser?.role === "HIRING_MANAGER" && <CheckCircle2 className="w-4 h-4 text-purple-600" />}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Profile Info */}
             {currentUser && (
-              <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+              <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
                 <div className="text-right hidden sm:block">
                   <p className="text-xs font-semibold text-slate-900 leading-none">{currentUser.fullName}</p>
-                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                    {currentUser.role === "ADMIN" && "Quản trị viên"}
-                    {currentUser.role === "HR" && "Chuyên viên Tuyển dụng"}
-                    {currentUser.role === "HIRING_MANAGER" && "Quản lý Chuyên môn"}
-                  </p>
+                  <div className="mt-1">
+                    {currentUser.role === "ADMIN" && (
+                      <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                        ADMIN
+                      </span>
+                    )}
+                    {currentUser.role === "HR" && (
+                      <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+                        HR LEAD
+                      </span>
+                    )}
+                    {currentUser.role === "HIRING_MANAGER" && (
+                      <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800">
+                        HIRING MANAGER
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-700">
+                <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-700 border border-brand-200 flex items-center justify-center text-xs font-bold">
                   {currentUser.fullName.charAt(0)}
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg transition-colors ml-1"
+                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-1"
                   title="Đăng xuất"
                 >
                   <LogOut className="w-4 h-4" />

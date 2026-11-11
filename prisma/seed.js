@@ -8,11 +8,11 @@ async function main() {
   // 1. Tạo tài khoản Admin, HR & Hiring Manager
   const adminUser = await prisma.user.upsert({
     where: { email: "admin@recoverx.career" },
-    update: {},
+    update: { passwordHash: "Admin@123" },
     create: {
       fullName: "Nguyễn Văn An (Hệ thống Admin)",
       email: "admin@recoverx.career",
-      passwordHash: "hashed_password_admin",
+      passwordHash: "Admin@123",
       role: "ADMIN",
       isActive: true,
     },
@@ -20,11 +20,11 @@ async function main() {
 
   const hrUser = await prisma.user.upsert({
     where: { email: "hr@recoverx.career" },
-    update: {},
+    update: { passwordHash: "Hr@123456" },
     create: {
       fullName: "Nguyễn Thu Hà (Lead HR)",
       email: "hr@recoverx.career",
-      passwordHash: "hashed_password_123",
+      passwordHash: "Hr@123456",
       role: "HR",
       isActive: true,
     },
@@ -32,11 +32,11 @@ async function main() {
 
   const hiringManager = await prisma.user.upsert({
     where: { email: "techlead@recoverx.career" },
-    update: {},
+    update: { passwordHash: "Manager@123" },
     create: {
       fullName: "Trần Minh Quân (Engineering Lead)",
       email: "techlead@recoverx.career",
-      passwordHash: "hashed_password_123",
+      passwordHash: "Manager@123",
       role: "HIRING_MANAGER",
       isActive: true,
     },
