@@ -25,7 +25,8 @@ D:\ATS project/
 │   ├── 07_Database_Design_ERD.md                # Thiết kế CSDL PostgreSQL, Data Dictionary, mã SQL DDL, ERD Draw.io & Mermaid
 │   ├── 08_NonFunctional_and_Permissions.md      # Ma trận phân quyền RBAC & Yêu cầu phi chức năng (NFR)
 │   ├── 09_Technical_Setup_and_Antigravity_Guide.md # Định hướng Frontend, Clone Dashboard & Hướng dẫn thiết lập Antigravity CI
-│   └── 10_Scope_and_System_Comparison.md        # Bản phân định In/Out-Scope, hệ thống clone & so sánh điểm hơn/kém
+│   ├── 10_Scope_and_System_Comparison.md        # Bản phân định In/Out-Scope, hệ thống clone & so sánh điểm hơn/kém
+│   └── TEST_SCENARIOS_AND_UAT_GUIDE.md          # Hướng dẫn 7 kịch bản kiểm thử thực hành (UAT Test Scenarios)
 │
 ├── media/                                       # Toàn bộ 14 hình ảnh sơ đồ & tệp đính kèm gốc
 │   ├── media_1794120545429_f88cf311.png         # Sơ đồ As-Is vẽ tay ban đầu
