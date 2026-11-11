@@ -1,0 +1,122 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. Users table (Nội bộ: Admin, HR, Hiring Manager)
+model User {
+  id           Int          @id @default(autoincrement())
+  fullName     String
+  email        String       @unique
+  passwordHash String
+  role         String       @default("HR") // ADMIN, HR, HIRING_MANAGER
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+
+  jobs         Job[]
+  evaluations  Evaluation[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+// 2. Jobs table (Vị trí tuyển dụng & Tiêu chuẩn JD)
+model Job {
+  id                 Int           @id @default(autoincrement())
+  creatorId          Int
+  creator            User          @relation(fields: [creatorId], references: [id])
+  title              String
+  department         String
+  location           String        @default("Hồ Chí Minh")
+  employmentType     String        @default("Toàn thời gian")
+  requirementsJd     String
+  minExperienceYears Int           @default(0)
+  requiredSkills     String        @default("[]") // JSON string: ["React", "TypeScript"]
+  status             String        @default("ACTIVE") // ACTIVE, CLOSED
+  createdAt          DateTime      @default(now())
+
+  applications       Application[]
+
+  @@map("jobs")
+}
+
+// 3. Candidates table (Ứng viên & Khử trùng lặp)
+model Candidate {
+  id              Int           @id @default(autoincrement())
+  fullName        String
+  email           String
+  phone           String
+  experienceYears Int           @default(0)
+  parsedSkills    String?       @default("[]") // JSON string
+  parsedEducation String?       @default("[]") // JSON string
+  parsedExperience String?      @default("[]") // JSON string
+  cvFileUrl       String
+  cvText          String?       // Raw extracted text from PDF
+  createdAt       DateTime      @default(now())
+
+  applications    Application[]
+
+  @@unique([email, phone]) // BRL-02 Deduplication key
+  @@map("candidates")
+}
+
+// 4. Applications table (Hồ sơ ứng tuyển theo Job & Kanban Pipeline)
+model Application {
+  id                 Int          @id @default(autoincrement())
+  candidateId        Int
+  candidate          Candidate    @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  jobId              Int
+  job                Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  currentStage       String       @default("NEW") // NEW, SCREENING, INTERVIEW, HIRED, REJECTED
+  aiMatchScore       Float?       // 0.0 - 100.0%
+  aiMatchRationale   String?      // Explanation why scored this %
+  aiMatchedSkills    String?      @default("[]") // JSON string
+  aiMissingSkills    String?      @default("[]") // JSON string
+  stageUpdatedAt     DateTime     @default(now())
+  emailScheduledAt   DateTime?    // BRL-05 Rejection delay buffer (+12h)
+  isEmailSent        Boolean      @default(false)
+  repooledFromId     Int?
+  createdAt          DateTime     @default(now())
+
+  evaluations        Evaluation[]
+  auditLogs          AuditLog[]
+
+  @@map("applications")
+}
+
+// 5. Evaluations table (Phiếu chấm điểm phỏng vấn - Scorecard)
+model Evaluation {
+  id                 Int         @id @default(autoincrement())
+  applicationId      Int
+  application        Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  evaluatorId        Int
+  evaluator          User        @relation(fields: [evaluatorId], references: [id])
+  technicalScore     Int         // 1 - 5 (Trọng số 40%)
+  communicationScore Int         // 1 - 5 (Trọng số 30%)
+  culturalFitScore   Int         // 1 - 5 (Trọng số 30%)
+  overallScore       Float?      // Weighted average: (tech*0.4 + comm*0.3 + cult*0.3)
+  comments           String?
+  recommendation     String      @default("HIRE") // STRONG_HIRE, HIRE, NO_HIRE, STRONG_NO_HIRE
+  createdAt          DateTime    @default(now())
+
+  @@map("evaluations")
+}
+
+// 6. AuditLogs table (Lưu vết chuyển cột Kanban & thao tác hệ thống)
+model AuditLog {
+  id            Int          @id @default(autoincrement())
+  applicationId Int
+  application   Application  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  userId        Int?
+  user          User?        @relation(fields: [userId], references: [id])
+  fromStage     String?
+  toStage       String
+  action        String       // STAGE_CHANGE, CV_UPLOAD, SCORECARD_EVALUATE
+  createdAt     DateTime     @default(now())
+
+  @@map("audit_logs")
+}
