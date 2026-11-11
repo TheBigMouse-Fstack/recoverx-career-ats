@@ -9,8 +9,8 @@ export type ApplicationStatus =
 // User Roles (RBAC)
 export type UserRole =
   | "ADMIN"
+  | "HR"
   | "HR_MANAGER"
-  | "RECRUITER"
   | "HIRING_MANAGER"
   | "INTERVIEWER";
 
