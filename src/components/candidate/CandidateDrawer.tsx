@@ -20,6 +20,7 @@ import {
   History,
 } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
+import ScorecardModal from "@/components/scorecard/ScorecardModal";
 
 interface CandidateDrawerProps {
   applicationId: number | null;
@@ -37,6 +38,7 @@ export default function CandidateDrawer({
   const [activeTab, setActiveTab] = useState<"overview" | "cv" | "history">("overview");
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [isScorecardOpen, setIsScorecardOpen] = useState(false);
 
   // Tải chi tiết hồ sơ
   useEffect(() => {
@@ -366,10 +368,20 @@ export default function CandidateDrawer({
                   <div className="space-y-6">
                     {/* Scorecards */}
                     <div className="space-y-3">
-                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                        <Star className="w-4 h-4 text-purple-600 fill-purple-600" />
-                        Phiếu đánh giá phỏng vấn (Scorecards):
-                      </h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                          <Star className="w-4 h-4 text-purple-600 fill-purple-600" />
+                          Phiếu đánh giá phỏng vấn (Scorecards):
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => setIsScorecardOpen(true)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                        >
+                          <Star className="w-3.5 h-3.5 fill-white" />
+                          + Chấm Điểm Scorecard (BRL-08)
+                        </button>
+                      </div>
 
                       {data?.evaluations?.length === 0 ? (
                         <div className="p-4 rounded-xl border border-dashed border-slate-200 text-center text-xs text-slate-400">
@@ -463,6 +475,20 @@ export default function CandidateDrawer({
           </div>
         </div>
       </div>
+
+      {/* Scorecard Modal (BRL-08) */}
+      <ScorecardModal
+        applicationId={applicationId}
+        candidateName={data?.candidate?.fullName || ""}
+        jobTitle={data?.job?.title || ""}
+        isOpen={isScorecardOpen}
+        onClose={() => setIsScorecardOpen(false)}
+        onSuccess={() => {
+          fetch(`/api/applications/${applicationId}`)
+            .then((r) => r.json())
+            .then((r) => r.success && setData(r.data));
+        }}
+      />
     </div>
   );
 }

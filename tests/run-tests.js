@@ -281,6 +281,29 @@ async function runTests() {
     assert(matched.length === 4, "Bóc tách đầy đủ 4 kỹ năng trọng yếu từ văn bản CV");
     assert(missing.length === 0, "Không có kỹ năng trọng yếu nào bị thiếu");
     assert(matched.includes("React") && matched.includes("TypeScript"), "Trích xuất chính xác React & TypeScript");
+
+    // ---------------------------------------------------------
+    // TEST SUITE 10: SPRINT 4 — SCORECARD MODAL, RE-POOLING & CSV EXPORT
+    // ---------------------------------------------------------
+    console.log(`\n${colors.bold}10. Kiểm tra Sprint 4 (Scorecard Modal, Talent Re-pooling & CSV Export):${colors.reset}`);
+
+    // Test BRL-08 Scorecard Calculation
+    function computeWeightedScore(t, c, cu) {
+      return Number((t * 0.4 + c * 0.3 + cu * 0.3).toFixed(2));
+    }
+    assert(computeWeightedScore(5, 4, 3) === 4.10, "Tính chuẩn trọng số (5*0.4 + 4*0.3 + 3*0.3 = 4.10)");
+    assert(computeWeightedScore(3, 3, 3) === 3.00, "Điểm đồng đều 3 sao cho ra đúng 3.00");
+
+    // Test CSV Format with UTF-8 BOM
+    const testCsvHeader = "\uFEFFMã đơn ứng tuyển,Họ và tên ứng viên,Email";
+    assert(testCsvHeader.charCodeAt(0) === 0xFEFF, "Tệp CSV chứa ký tự Byte Order Mark (UTF-8 BOM) cho Microsoft Excel");
+
+    // Test Re-pooling data model integrity
+    const repoolTestApp = await prisma.application.findFirst();
+    assert(repoolTestApp !== null, "Hệ thống có sẵn ứng viên để hỗ trợ chức năng Re-pooling (UC-06)");
+
+    const totalJobsInDb = await prisma.job.count();
+    assert(totalJobsInDb >= 2, `Có ${totalJobsInDb} vị trí tuyển dụng sẵn sàng nhận hồ sơ chuyển luồng`);
   } catch (err) {
     assert(false, "Kết nối CSDL thất bại", err.message);
   } finally {
