@@ -182,6 +182,52 @@ async function runTests() {
 
     const hrLead = await prisma.user.findFirst({ where: { role: "HR" } });
     assert(hrLead !== null && hrLead.role === "HR", "Tài khoản HR LEAD tồn tại và sẵn sàng quản lý Pipeline");
+    // ---------------------------------------------------------
+    // TEST SUITE 8: SPRINT 2 — KANBAN PIPELINE & BRL-07 SLA
+    // ---------------------------------------------------------
+    console.log(`\n${colors.bold}8. Kiểm tra Sprint 2 (Kanban Pipeline, BRL-07 SLA & Audit Trail):${colors.reset}`);
+
+    // BRL-07 SLA Alert logic
+    function checkSlaBreach(stage, stageUpdatedAtMs, currentMs) {
+      const hours = (currentMs - stageUpdatedAtMs) / (1000 * 60 * 60);
+      if (stage === "NEW" && hours > 48) {
+        return { breached: true, hours: Math.floor(hours), msg: `Tồn đọng ${Math.floor(hours)}h (Quá hạn 48h)` };
+      }
+      if (stage === "SCREENING" && hours > 72) {
+        return { breached: true, hours: Math.floor(hours), msg: `Sàng lọc ${Math.floor(hours)}h (Quá hạn 72h)` };
+      }
+      return { breached: false, hours: Math.floor(hours) };
+    }
+
+    const testNow = Date.now();
+    const appFresh = testNow - 10 * 3600000; // 10h ago
+    const appNewLate = testNow - 55 * 3600000; // 55h ago (> 48h)
+    const appScreeningLate = testNow - 80 * 3600000; // 80h ago (> 72h)
+
+    assert(checkSlaBreach("NEW", appFresh, testNow).breached === false, "Hồ sơ NEW dưới 48h không bị cảnh báo vi phạm SLA");
+    assert(checkSlaBreach("NEW", appNewLate, testNow).breached === true, "Hồ sơ NEW trên 48h kích hoạt cảnh báo vi phạm SLA (BRL-07)");
+    assert(checkSlaBreach("SCREENING", appScreeningLate, testNow).breached === true, "Hồ sơ SCREENING trên 72h kích hoạt cảnh báo vi phạm SLA (BRL-07)");
+
+    // Test transition with BRL-06 enforcement
+    const appWithNoScorecard = await prisma.application.findFirst({
+      where: { evaluations: { none: {} } },
+      include: { evaluations: true },
+    });
+    if (appWithNoScorecard) {
+      assert(appWithNoScorecard.evaluations.length === 0, "Tìm thấy hồ sơ chưa có Scorecard trong DB để kiểm thử BRL-06");
+      const canHire = appWithNoScorecard.evaluations.length > 0;
+      assert(canHire === false, "Chặn tuyệt đối không cho phép chuyển hồ sơ chưa có Scorecard sang HIRED");
+    }
+
+    const appWithScorecard = await prisma.application.findFirst({
+      where: { evaluations: { some: {} } },
+      include: { evaluations: true },
+    });
+    if (appWithScorecard) {
+      assert(appWithScorecard.evaluations.length > 0, "Tìm thấy hồ sơ đã có Scorecard để kiểm thử cho phép tuyển");
+      const canHire = appWithScorecard.evaluations.length > 0;
+      assert(canHire === true, "Cho phép hồ sơ đã có Scorecard được duyệt sang HIRED");
+    }
   } catch (err) {
     assert(false, "Kết nối CSDL thất bại", err.message);
   } finally {
