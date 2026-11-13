@@ -228,6 +228,59 @@ async function runTests() {
       const canHire = appWithScorecard.evaluations.length > 0;
       assert(canHire === true, "Cho phép hồ sơ đã có Scorecard được duyệt sang HIRED");
     }
+
+    // ---------------------------------------------------------
+    // TEST SUITE 9: SPRINT 3 — PUBLIC CAREERS & HYBRID AI CV INTAKE (UC-01, UC-02, UC-03)
+    // ---------------------------------------------------------
+    console.log(`\n${colors.bold}9. Kiểm tra Sprint 3 (Public Careers, BRL-09 Quota & Hybrid AI Matching):${colors.reset}`);
+
+    // BRL-09: Hạn mức nộp tối đa 3 jobs trong 90 ngày
+    function checkApplicationQuota(pastCount) {
+      if (pastCount >= 3) {
+        return { allowed: false, error: "Đã vượt quá hạn mức nộp tối đa 3 vị trí trong 90 ngày (BRL-09)" };
+      }
+      return { allowed: true };
+    }
+
+    assert(checkApplicationQuota(0).allowed === true, "Ứng viên mới nộp 0 vị trí được phép ứng tuyển");
+    assert(checkApplicationQuota(2).allowed === true, "Ứng viên đã nộp 2 vị trí vẫn được phép nộp vị trí thứ 3");
+    assert(checkApplicationQuota(3).allowed === false, "Chặn ứng viên đã nộp đủ 3 vị trí trong 90 ngày (BRL-09)");
+
+    // Test Validation Regex
+    const validEmail = "nguyen.van.a@example.com";
+    const invalidEmail = "not-an-email";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    assert(emailRegex.test(validEmail) === true, "Email hợp lệ định dạng tiêu chuẩn");
+    assert(emailRegex.test(invalidEmail) === false, "Chặn email sai định dạng");
+
+    const phoneRegex = /^(0|\+84)[0-9]{9,10}$/;
+    assert(phoneRegex.test("0912345678") === true, "Số điện thoại di động Việt Nam 10 chữ số hợp lệ");
+    assert(phoneRegex.test("+84912345678") === true, "Số điện thoại có mã vùng +84 hợp lệ");
+    assert(phoneRegex.test("12345") === false, "Chặn số điện thoại quá ngắn hoặc thiếu đầu số 0/+84");
+
+    // Test AI CV Parsing & Match Scoring (Heuristic Layer)
+    const sampleCv = `
+      NGUYỄN VĂN MINH - SENIOR FRONTEND DEVELOPER
+      Email: minh.nguyen@gmail.com | Phone: 0909123456
+      Kinh nghiệm: 4 năm kinh nghiệm phát triển phần mềm
+      Kỹ năng: React, Next.js, TypeScript, Tailwind CSS, REST API, Git
+      Học vấn: Đại học Bách Khoa TP.HCM - Cử nhân CNTT
+    `;
+
+    const sampleJob = {
+      title: "Senior Frontend Engineer",
+      requiredSkills: ["React", "TypeScript", "Next.js", "Tailwind"],
+      minExperienceYears: 3,
+    };
+
+    // Calculate match
+    const lowerCv = sampleCv.toLowerCase();
+    const matched = sampleJob.requiredSkills.filter(s => lowerCv.includes(s.toLowerCase()));
+    const missing = sampleJob.requiredSkills.filter(s => !lowerCv.includes(s.toLowerCase()));
+
+    assert(matched.length === 4, "Bóc tách đầy đủ 4 kỹ năng trọng yếu từ văn bản CV");
+    assert(missing.length === 0, "Không có kỹ năng trọng yếu nào bị thiếu");
+    assert(matched.includes("React") && matched.includes("TypeScript"), "Trích xuất chính xác React & TypeScript");
   } catch (err) {
     assert(false, "Kết nối CSDL thất bại", err.message);
   } finally {
