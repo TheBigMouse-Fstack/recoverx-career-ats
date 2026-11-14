@@ -120,11 +120,10 @@ export default function ScorecardModal({
                 setFieldErrors(next);
               }
             }}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all ${
-              star <= value
+            className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all ${star <= value
                 ? "bg-amber-500 text-white shadow-xs scale-105"
                 : "bg-slate-100 text-slate-400 hover:bg-slate-200"
-            }`}
+              }`}
           >
             <Star
               className={`w-4 h-4 ${star <= value ? "fill-white" : ""}`}
@@ -310,3 +309,5 @@ export default function ScorecardModal({
     </div>
   );
 }
+
+

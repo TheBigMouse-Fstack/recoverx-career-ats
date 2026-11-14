@@ -40,13 +40,12 @@ export default function CandidateCard({
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           onClick={() => onOpenDrawer(application.id)}
-          className={`group bg-white rounded-xl border p-4 mb-3 transition-all cursor-pointer relative ${
-            snapshot.isDragging
+          className={`group bg-white rounded-xl border p-4 mb-3 transition-all cursor-pointer relative ${snapshot.isDragging
               ? "shadow-2xl border-brand-500 ring-2 ring-brand-500/20 rotate-1 scale-102"
               : isSlaBreached
-              ? "border-red-300 shadow-xs hover:border-red-400 hover:shadow-md"
-              : "border-slate-200/90 shadow-2xs hover:border-brand-400 hover:shadow-md"
-          }`}
+                ? "border-red-300 shadow-xs hover:border-red-400 hover:shadow-md"
+                : "border-slate-200/90 shadow-2xs hover:border-brand-400 hover:shadow-md"
+            }`}
         >
           {/* Cảnh báo vi phạm SLA đỏ (BRL-07) */}
           {isSlaBreached && (
@@ -113,3 +112,5 @@ export default function CandidateCard({
     </Draggable>
   );
 }
+
+

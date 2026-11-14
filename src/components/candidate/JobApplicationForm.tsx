@@ -178,13 +178,12 @@ export default function JobApplicationForm({
               Kết quả AI Sàng lọc Ban đầu
             </span>
             <span
-              className={`px-3 py-1 rounded-full text-xs font-extrabold border ${
-                successResult.aiMatchScore >= 75
+              className={`px-3 py-1 rounded-full text-xs font-extrabold border ${successResult.aiMatchScore >= 75
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                   : successResult.aiMatchScore >= 60
-                  ? "bg-amber-50 text-amber-700 border-amber-200"
-                  : "bg-slate-100 text-slate-700 border-slate-300"
-              }`}
+                    ? "bg-amber-50 text-amber-700 border-amber-200"
+                    : "bg-slate-100 text-slate-700 border-slate-300"
+                }`}
             >
               Match Score: {successResult.aiMatchScore}%
             </span>
@@ -282,11 +281,10 @@ export default function JobApplicationForm({
           onChange={(e) => handleInputChange("fullName", e.target.value, setFullName)}
           placeholder="Ví dụ: Nguyễn Văn An"
           disabled={loading}
-          className={`w-full text-xs rounded-xl border py-2.5 px-3.5 font-medium transition-all focus:outline-none focus:ring-2 ${
-            fieldErrors.fullName
+          className={`w-full text-xs rounded-xl border py-2.5 px-3.5 font-medium transition-all focus:outline-none focus:ring-2 ${fieldErrors.fullName
               ? "border-red-500 bg-red-50/20 focus:ring-red-500/20 text-red-900"
               : "border-slate-200 bg-slate-50/50 focus:ring-brand-500 focus:bg-white text-slate-900"
-          }`}
+            }`}
         />
         {fieldErrors.fullName && (
           <p className="text-[11px] text-red-600 font-medium mt-1 flex items-center gap-1">
@@ -307,11 +305,10 @@ export default function JobApplicationForm({
           onChange={(e) => handleInputChange("email", e.target.value, setEmail)}
           placeholder="Ví dụ: an.nguyen@example.com"
           disabled={loading}
-          className={`w-full text-xs rounded-xl border py-2.5 px-3.5 font-medium transition-all focus:outline-none focus:ring-2 ${
-            fieldErrors.email
+          className={`w-full text-xs rounded-xl border py-2.5 px-3.5 font-medium transition-all focus:outline-none focus:ring-2 ${fieldErrors.email
               ? "border-red-500 bg-red-50/20 focus:ring-red-500/20 text-red-900"
               : "border-slate-200 bg-slate-50/50 focus:ring-brand-500 focus:bg-white text-slate-900"
-          }`}
+            }`}
         />
         {fieldErrors.email && (
           <p className="text-[11px] text-red-600 font-medium mt-1 flex items-center gap-1">
@@ -332,11 +329,10 @@ export default function JobApplicationForm({
           onChange={(e) => handleInputChange("phone", e.target.value, setPhone)}
           placeholder="Ví dụ: 0912345678 hoặc +84912345678"
           disabled={loading}
-          className={`w-full text-xs rounded-xl border py-2.5 px-3.5 font-medium transition-all focus:outline-none focus:ring-2 ${
-            fieldErrors.phone
+          className={`w-full text-xs rounded-xl border py-2.5 px-3.5 font-medium transition-all focus:outline-none focus:ring-2 ${fieldErrors.phone
               ? "border-red-500 bg-red-50/20 focus:ring-red-500/20 text-red-900"
               : "border-slate-200 bg-slate-50/50 focus:ring-brand-500 focus:bg-white text-slate-900"
-          }`}
+            }`}
         />
         {fieldErrors.phone && (
           <p className="text-[11px] text-red-600 font-medium mt-1 flex items-center gap-1">
@@ -356,13 +352,12 @@ export default function JobApplicationForm({
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
-            fieldErrors.cvFile
+          className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${fieldErrors.cvFile
               ? "border-red-400 bg-red-50/30 hover:bg-red-50/50"
               : cvFile
-              ? "border-emerald-400 bg-emerald-50/30 hover:bg-emerald-50/50"
-              : "border-slate-300 bg-slate-50/50 hover:bg-slate-100 hover:border-brand-400"
-          }`}
+                ? "border-emerald-400 bg-emerald-50/30 hover:bg-emerald-50/50"
+                : "border-slate-300 bg-slate-50/50 hover:bg-slate-100 hover:border-brand-400"
+            }`}
         >
           <input
             type="file"
@@ -456,3 +451,5 @@ export default function JobApplicationForm({
     </form>
   );
 }
+
+

@@ -452,11 +452,10 @@ export default function KanbanBoard() {
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`flex-1 p-3 overflow-y-auto transition-colors ${
-                        snapshot.isDraggingOver
+                      className={`flex-1 p-3 overflow-y-auto transition-colors ${snapshot.isDraggingOver
                           ? "bg-brand-50/50 ring-2 ring-brand-400/50 ring-inset"
                           : ""
-                      }`}
+                        }`}
                     >
                       {columnItems.length === 0 ? (
                         <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-4 text-center">
@@ -500,3 +499,5 @@ export default function KanbanBoard() {
     </div>
   );
 }
+
+

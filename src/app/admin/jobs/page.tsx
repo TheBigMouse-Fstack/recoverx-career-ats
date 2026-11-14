@@ -297,11 +297,10 @@ export default function AdminJobsPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Ví dụ: Senior Backend Engineer"
-                  className={`w-full rounded-xl border py-2 px-3 font-medium ${
-                    fieldErrors.title
+                  className={`w-full rounded-xl border py-2 px-3 font-medium ${fieldErrors.title
                       ? "border-red-500 bg-red-50/20"
                       : "border-slate-200 bg-slate-50/50"
-                  }`}
+                    }`}
                 />
                 {fieldErrors.title && (
                   <p className="text-red-600 font-medium mt-1">{fieldErrors.title}</p>
@@ -381,11 +380,10 @@ export default function AdminJobsPage() {
                   value={requirementsJd}
                   onChange={(e) => setRequirementsJd(e.target.value)}
                   placeholder="Mô tả trách nhiệm công việc, yêu cầu chuyên môn, quyền lợi..."
-                  className={`w-full rounded-xl border p-3 font-medium ${
-                    fieldErrors.requirementsJd
+                  className={`w-full rounded-xl border p-3 font-medium ${fieldErrors.requirementsJd
                       ? "border-red-500 bg-red-50/20"
                       : "border-slate-200 bg-slate-50/50"
-                  }`}
+                    }`}
                 />
                 {fieldErrors.requirementsJd && (
                   <p className="text-red-600 font-medium mt-1">{fieldErrors.requirementsJd}</p>
@@ -416,3 +414,5 @@ export default function AdminJobsPage() {
     </div>
   );
 }
+
+

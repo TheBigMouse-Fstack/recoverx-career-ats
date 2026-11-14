@@ -208,3 +208,4 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
     </div>
   );
 }
+
